@@ -5,6 +5,7 @@ from tokens import token
 
 bot = telebot.TeleBot(token)
 
+
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup()
@@ -18,6 +19,7 @@ def start(message):
 categories_and_courses = get_category()
 courses = []
 
+
 @bot.message_handler()
 def on_click1(message):
     if message.text == "Courses":
@@ -28,7 +30,6 @@ def on_click1(message):
         bot.send_message(message.chat.id, "Choose courses category: ", reply_markup=markup)
 
         bot.register_next_step_handler(message, on_click2)
-
 
 
 @bot.message_handler()
