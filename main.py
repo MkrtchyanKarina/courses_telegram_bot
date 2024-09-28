@@ -1,9 +1,9 @@
 from telebot import types
 import telebot
 from parse import get_category, request_id
-from tokens import token
+from tokens import bot_token
 
-bot = telebot.TeleBot(token)
+bot = telebot.TeleBot(bot_token)
 
 
 @bot.message_handler(commands=['start'])
@@ -13,7 +13,7 @@ def start(message):
     markup.add(main_button)
     bot.send_message(message.chat.id, "Hi!", reply_markup=markup)
 
-    bot.register_next_step_handler(message, on_click1)
+    bot.register_next_step_handler(message, return_categories)
 
 
 categories_and_courses = get_category()
@@ -21,7 +21,7 @@ courses = []
 
 
 @bot.message_handler()
-def on_click1(message):
+def return_categories(message):
     if message.text == "Courses":
         markup = types.ReplyKeyboardMarkup()
         for i in categories_and_courses:
@@ -29,11 +29,11 @@ def on_click1(message):
 
         bot.send_message(message.chat.id, "Choose courses category: ", reply_markup=markup)
 
-        bot.register_next_step_handler(message, on_click2)
+        bot.register_next_step_handler(message, return_courses_names)
 
 
 @bot.message_handler()
-def on_click2(message):
+def return_courses_names(message):
     markup = types.ReplyKeyboardMarkup()
     for i in categories_and_courses:
         if message.text == i[0]:
@@ -43,11 +43,11 @@ def on_click2(message):
                 courses.append([course_name, "https://stepik.org/course/" + str(j)])
                 markup.add(types.KeyboardButton(course_name))
     bot.send_message(message.chat.id, "Choose liked course: ", reply_markup=markup)
-    bot.register_next_step_handler(message, on_click3)
+    bot.register_next_step_handler(message, return_links)
 
 
 @bot.message_handler()
-def on_click3(message):
+def return_links(message):
     c = 1
     for i in courses:
         if message.text == i[0]:
@@ -55,7 +55,7 @@ def on_click3(message):
             c = 0
     if c:
         bot.reply_to(message, "Can't find this course")
-    bot.register_next_step_handler(message, on_click3)
+    bot.register_next_step_handler(message, return_links)
 
 
 bot.infinity_polling(none_stop=True)
